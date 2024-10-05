@@ -7,17 +7,20 @@
     <!-- Include Tailwind CSS from CDN -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.4/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        /* Add gradient overlay */
+        /* Add gradient overlay with rounded corners */
         .image-overlay {
             position: relative;
             display: inline-block;
+            border-radius: 0.5rem; /* Rounded corners */
+            overflow: hidden; /* Ensure the corners are rounded for the overlay */
         }
 
         .image-overlay img {
             display: block;
-            height: 128px;
-            width: 128px;
+            height: 128px; /* Adjust as needed */
+            width: 128px; /* Adjust as needed */
             object-fit: cover;
+            border-radius: 0.5rem; /* Rounded corners */
         }
 
         .image-overlay::after {
@@ -29,7 +32,7 @@
             bottom: 0;
             background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
             z-index: 1;
-            border-radius: 0px; /* Remove any border radius */
+            border-radius: 0.5rem; /* Match rounded corners */
         }
 
         .image-overlay p {
