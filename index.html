@@ -105,6 +105,51 @@
         .dark-mode-toggle:hover {
             background-color: #ff4500;
         }
+
+        /* Pizza Rain Animation */
+        @keyframes pizzaRain {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .pizza-rain {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            font-size: 2rem;
+            animation: pizzaRain 3s linear infinite;
+        }
+
+        /* Spin Wheel Animation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spin-wheel {
+            border: 5px solid #ff6347;
+            border-radius: 50%;
+            height: 150px;
+            width: 150px;
+            position: relative;
+        }
+
+        .spin-button {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #ff6347;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .spin-wheel.spin {
+            animation: spin 2s ease-out;
+        }
     </style>
 </head>
 <body>
@@ -146,6 +191,16 @@
         <button class="btn">Order Now</button>
     </div>
 
+    <!-- Microgame: Spin the Pizza Wheel -->
+    <div class="flex justify-center mt-8">
+        <div class="spin-wheel" id="pizzaWheel">
+            <button class="spin-button">Spin</button>
+        </div>
+    </div>
+
+    <!-- Pizza Rain -->
+    <div id="pizzaRain"></div>
+
     <script>
         // Dark mode toggle logic
         const toggle = document.querySelector('.dark-mode-toggle');
@@ -158,6 +213,35 @@
                 document.body.style.backgroundColor = '#ffffff';
                 document.body.style.color = '#000000';
             }
+        });
+
+        // Pizza Rain
+        const pizzaRain = document.getElementById('pizzaRain');
+        function createPizzaRain() {
+            for (let i = 0; i < 10; i++) {
+                const pizza = document.createElement('i');
+                pizza.classList.add('fas', 'fa-pizza-slice', 'pizza-rain');
+                pizza.style.left = Math.random() * window.innerWidth + 'px';
+                pizza.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                pizzaRain.appendChild(pizza);
+
+                setTimeout(() => pizza.remove(), 5000);
+            }
+        }
+
+        // Microgame: Spin the Pizza Wheel
+        const pizzaWheel = document.getElementById('pizzaWheel');
+        const spinButton = pizzaWheel.querySelector('.spin-button');
+
+        spinButton.addEventListener('click', () => {
+            pizzaWheel.classList.add('spin');
+            setTimeout(() => pizzaWheel.classList.remove('spin'), 2000);
+        });
+
+        // Activate pizza rain on clicking the "Order Now" button
+        const orderBtn = document.querySelector('.btn');
+        orderBtn.addEventListener('click', () => {
+            createPizzaRain();
         });
     </script>
 
