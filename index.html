@@ -106,49 +106,44 @@
             background-color: #ff4500;
         }
 
-        /* Pizza Rain Animation */
-        @keyframes pizzaRain {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100vh); }
-        }
-
-        .pizza-rain {
-            position: absolute;
-            top: -50px;
-            left: 50%;
-            font-size: 2rem;
-            animation: pizzaRain 3s linear infinite;
-        }
-
-        /* Spin Wheel Animation */
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .spin-wheel {
-            border: 5px solid #ff6347;
-            border-radius: 50%;
-            height: 150px;
-            width: 150px;
+        /* Pizza Catch Game */
+        .game-container {
             position: relative;
+            width: 100%;
+            height: 300px;
+            border: 2px solid #ff6347;
+            margin-top: 30px;
+            background-color: #333;
+            overflow: hidden;
         }
 
-        .spin-button {
+        .pizza-slice {
             position: absolute;
-            bottom: 10px;
+            width: 40px;
+            height: 40px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/3143/3143643.png');
+            background-size: cover;
+            animation: fall 5s linear infinite;
+        }
+
+        .pizza-box {
+            position: absolute;
+            bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            padding: 10px 20px;
-            background-color: #ff6347;
-            color: white;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: transform 0.3s ease;
+            width: 80px;
+            height: 80px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/3144/3144456.png');
+            background-size: cover;
         }
 
-        .spin-wheel.spin {
-            animation: spin 2s ease-out;
+        @keyframes fall {
+            0% {
+                top: -50px;
+            }
+            100% {
+                top: 100%;
+            }
         }
     </style>
 </head>
@@ -191,15 +186,10 @@
         <button class="btn">Order Now</button>
     </div>
 
-    <!-- Microgame: Spin the Pizza Wheel -->
-    <div class="flex justify-center mt-8">
-        <div class="spin-wheel" id="pizzaWheel">
-            <button class="spin-button">Spin</button>
-        </div>
+    <!-- Microgame: Pizza Catch -->
+    <div class="game-container" id="gameContainer">
+        <div class="pizza-box" id="pizzaBox"></div>
     </div>
-
-    <!-- Pizza Rain -->
-    <div id="pizzaRain"></div>
 
     <script>
         // Dark mode toggle logic
@@ -215,34 +205,57 @@
             }
         });
 
-        // Pizza Rain
-        const pizzaRain = document.getElementById('pizzaRain');
-        function createPizzaRain() {
-            for (let i = 0; i < 10; i++) {
-                const pizza = document.createElement('i');
-                pizza.classList.add('fas', 'fa-pizza-slice', 'pizza-rain');
-                pizza.style.left = Math.random() * window.innerWidth + 'px';
-                pizza.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                pizzaRain.appendChild(pizza);
+        // Pizza Catch Game logic
+        const gameContainer = document.getElementById('gameContainer');
+        const pizzaBox = document.getElementById('pizzaBox');
 
-                setTimeout(() => pizza.remove(), 5000);
-            }
+        let score = 0;
+
+        // Create falling pizza slices
+        function createPizzaSlice() {
+            const pizzaSlice = document.createElement('div');
+            pizzaSlice.classList.add('pizza-slice');
+            pizzaSlice.style.left = Math.random() * (gameContainer.offsetWidth - 50) + 'px';
+
+            gameContainer.appendChild(pizzaSlice);
+
+            // Remove the pizza slice once it reaches the bottom
+            pizzaSlice.addEventListener('animationend', () => {
+                pizzaSlice.remove();
+            });
+
+            // Check if the pizza slice is caught by the box
+            const pizzaInterval = setInterval(() => {
+                const pizzaRect = pizzaSlice.getBoundingClientRect();
+                const boxRect = pizzaBox.getBoundingClientRect();
+
+                if (
+                    pizzaRect.bottom >= boxRect.top &&
+                    pizzaRect.left >= boxRect.left &&
+                    pizzaRect.right <= boxRect.right
+                ) {
+                    pizzaSlice.remove();
+                    score += 1;
+                    clearInterval(pizzaInterval);
+                }
+            }, 50);
         }
 
-        // Microgame: Spin the Pizza Wheel
-        const pizzaWheel = document.getElementById('pizzaWheel');
-        const spinButton = pizzaWheel.querySelector('.spin-button');
+        // Move the pizza box
+        document.addEventListener('mousemove', (e) => {
+            const boxWidth = pizzaBox.offsetWidth;
+            const maxLeft = gameContainer.offsetWidth - boxWidth;
 
-        spinButton.addEventListener('click', () => {
-            pizzaWheel.classList.add('spin');
-            setTimeout(() => pizzaWheel.classList.remove('spin'), 2000);
+            let newLeft = e.clientX - gameContainer.getBoundingClientRect().left - boxWidth / 2;
+
+            if (newLeft < 0) newLeft = 0;
+            if (newLeft > maxLeft) newLeft = maxLeft;
+
+            pizzaBox.style.left = newLeft + 'px';
         });
 
-        // Activate pizza rain on clicking the "Order Now" button
-        const orderBtn = document.querySelector('.btn');
-        orderBtn.addEventListener('click', () => {
-            createPizzaRain();
-        });
+        // Create pizzas every second
+        setInterval(createPizzaSlice, 1000);
     </script>
 
 </body>
